@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CountedCrossStitch</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="show_palette">Show Palette</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_palette">PaletteActivity</string>
+    <string name="loading_palette">Loading Palette...</string>
+
+</resources>
