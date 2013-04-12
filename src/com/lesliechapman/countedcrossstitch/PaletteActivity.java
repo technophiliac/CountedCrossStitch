@@ -48,7 +48,7 @@ public class PaletteActivity extends Activity {
 	        rect.getPaint().setColor(colors.get(i));
 
 	        ImageView view = new ImageView(this);	        
-	        view.setLayoutParams(new ViewGroup.LayoutParams(20, 20));
+	        view.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
 	        
 	        //view1.setImageDrawable(rect);
 	        view.setBackground(rect);        
@@ -58,7 +58,7 @@ public class PaletteActivity extends Activity {
 	        
 	        TextView textView = new TextView(this);
 	        textView.setText(ColorUtils.getDMCColor(colors.get(i)));
-	        textView.setLayoutParams(new ViewGroup.LayoutParams(200, 20));
+	        textView.setLayoutParams(new ViewGroup.LayoutParams(500, 50));
 	        rightFrame.addView(textView);
 		}
         

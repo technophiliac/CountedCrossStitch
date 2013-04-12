@@ -78,7 +78,7 @@ public class ColorUtils {
 		if (hexColor.equalsIgnoreCase("FFFFFF")){
 			return "blanc";
 		}
-		if (hexColor.equalsIgnoreCase("FFE6E4")){
+		if (hexColor.equalsIgnoreCase("F7DECF")){
 			return "ecru";
 		}
 		if (hexColor.equalsIgnoreCase("D9a899")){
