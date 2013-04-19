@@ -17,6 +17,9 @@ import android.graphics.drawable.GradientDrawable.Orientation;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,7 +33,9 @@ import android.widget.RelativeLayout;
 public class MainActivity extends Activity {
 	
 	private ScaleGestureDetector scaleGestureDetector;
+	private GestureDetector scrollGestureDetector;
 	private ZoomableRelativeLayout _layout;
+	private OnScrollListener _scrollListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,10 @@ public class MainActivity extends Activity {
 		
 		scaleGestureDetector = new ScaleGestureDetector(this,
 		        new OnPinchListener(_layout));
+		
+		_scrollListener = new OnScrollListener(_layout);
+		scrollGestureDetector = new GestureDetector(this,
+				_scrollListener);
 		
 		
 		drawCanvas();
@@ -81,7 +90,7 @@ public class MainActivity extends Activity {
 			
 	        int w = bmp.getWidth();
 	        int h = bmp.getHeight();
-	        int squareSize = 50;
+	        int squareSize = 5;
 	            		
 	        
 	        for (int x = 0; x < w; x++) {
@@ -107,12 +116,81 @@ public class MainActivity extends Activity {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		System.out.println("onTouchEvent got = " + event.toString());
 	 // TODO Auto-generated method stub
-	 scaleGestureDetector.onTouchEvent(event);
+		boolean handled = false;		
+		
+		if (!handled){
+			handled = scaleGestureDetector.onTouchEvent(event);
+			System.out.println("Handled by scaleGestureDetector = " + handled);
+		}
+		
+		if (!handled){
+			handled = scrollGestureDetector.onTouchEvent(event);
+			System.out.println("Handled by scrollGestureDetector = " + handled);
+		}
+		
+		
+		if (!handled){
+			if(event.getAction() == MotionEvent.ACTION_UP){
+				if(_scrollListener.getScrolling()){
+					//handleScrollFinished();
+					_scrollListener.setScrolling(false);
+				}
+			}
+		}
+		
 	 return true;
 	}
 	
 
+}
+
+class OnScrollListener extends SimpleOnGestureListener{
+	
+	ZoomableRelativeLayout _layout;
+	float totalX;
+	float totalY;
+	boolean isScrolling = false;
+	float initialX;
+	float initialY;
+	
+	public OnScrollListener(ZoomableRelativeLayout layout){
+		_layout = layout;
+	}
+	
+	@Override
+    public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+		System.out.println("onScroll()");
+		if (!isScrolling){
+			initialX = e1.getX();
+			initialY = e1.getY();
+		}
+		isScrolling = true;
+		//handleScroll(Math.round((e2.getX() - initialX)), Math.round((e2.getY() - initialY)));
+		_layout.setX(_layout.getX() - distanceX);
+		_layout.setY(_layout.getY() - distanceY);
+    	return true;
+    }
+	
+	@Override
+	public boolean onDown(MotionEvent e){
+		System.out.println("onDown()");
+		return true;
+	}
+	
+	public boolean getScrolling(){
+		return isScrolling;
+	}
+	
+	public void setScrolling(boolean b){
+		isScrolling = b;
+	}
+	
+	private void handleScroll(int X, int Y){
+		_layout.setX(_layout.getX() - X);
+		_layout.setY(_layout.getY() - Y);
+	}
 }
 
 class OnPinchListener extends SimpleOnScaleGestureListener {
@@ -128,6 +206,7 @@ class OnPinchListener extends SimpleOnScaleGestureListener {
     }
 
 
+    @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
         startingSpan = detector.getCurrentSpan();
         startFocusX = detector.getFocusX();
@@ -136,12 +215,15 @@ class OnPinchListener extends SimpleOnScaleGestureListener {
     }
 
 
+    @Override
     public boolean onScale(ScaleGestureDetector detector) {
     	_layout.scale(detector.getCurrentSpan()/startingSpan, startFocusX, startFocusY);
         return true;
     }
-
+    
+    @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
         //_layout.restore();
-    }
+    }   
+    
 }
