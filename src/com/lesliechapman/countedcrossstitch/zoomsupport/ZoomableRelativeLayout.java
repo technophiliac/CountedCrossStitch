@@ -1,4 +1,4 @@
-package zoomsupport;
+package com.lesliechapman.countedcrossstitch.zoomsupport;
 
 import android.content.Context;
 import android.graphics.Canvas;
