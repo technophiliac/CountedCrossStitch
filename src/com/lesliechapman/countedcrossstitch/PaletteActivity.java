@@ -7,6 +7,7 @@ import com.lesliechapman.countedcrossstitch.util.ColorUtils;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.view.Menu;
@@ -49,11 +50,19 @@ public class PaletteActivity extends Activity {
 
 	        ImageView view = new ImageView(this);	        
 	        view.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
-	        
-	        //view1.setImageDrawable(rect);
 	        view.setBackground(rect);        
-
 	        leftFrame.addView(view);
+	        view.setId(i);
+	        
+	        view.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					System.out.println("YOU CLICKED: " + v.getId());
+					((ShapeDrawable)v.getBackground()).getPaint().getColor();
+					
+				}
+			});
 	        
 	        
 	        TextView textView = new TextView(this);
@@ -61,6 +70,29 @@ public class PaletteActivity extends Activity {
 	        textView.setLayoutParams(new ViewGroup.LayoutParams(500, 50));
 	        rightFrame.addView(textView);
 		}
+		
+		ShapeDrawable rect = new ShapeDrawable(new RectShape());
+        rect.getPaint().setColor(Color.DKGRAY);
+
+        ImageView view = new ImageView(this);	        
+        view.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
+        view.setBackground(rect);        
+        leftFrame.addView(view);
+        
+        view.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				System.out.println("YOU CLICKED NONE");
+				
+			}
+		});
+        
+        
+        TextView textView = new TextView(this);
+        textView.setText("NONE");
+        textView.setLayoutParams(new ViewGroup.LayoutParams(500, 50));
+        rightFrame.addView(textView);
         
 	}
 

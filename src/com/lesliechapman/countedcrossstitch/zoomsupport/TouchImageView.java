@@ -1,7 +1,5 @@
 package com.lesliechapman.countedcrossstitch.zoomsupport;
 
-import com.lesliechapman.countedcrossstitch.MainActivity;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -117,12 +115,16 @@ public class TouchImageView extends ImageView {
 					mode = NONE;
 					int xDiff = (int) Math.abs(curr.x - start.x);
 					int yDiff = (int) Math.abs(curr.y - start.y);
-					if (xDiff < CLICK && yDiff < CLICK)
+					if (xDiff < CLICK && yDiff < CLICK) {
 						if (listener != null) {
+							System.out.println("saveScale = " + saveScale);
+							System.out.println("right = " + right);
+							System.out.println("bottom = " + bottom);
 							listener.onColorPicked(Math.round(curr.x),
 									Math.round(curr.y));
 						}
-					performClick();
+						performClick();
+					}
 					break;
 
 				case MotionEvent.ACTION_POINTER_UP:

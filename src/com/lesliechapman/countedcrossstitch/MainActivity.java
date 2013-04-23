@@ -1,51 +1,33 @@
 package com.lesliechapman.countedcrossstitch;
 
-import java.util.ArrayList;
-
 import com.lesliechapman.countedcrossstitch.util.ColorUtils;
 import com.lesliechapman.countedcrossstitch.zoomsupport.OnColorPickedListener;
 import com.lesliechapman.countedcrossstitch.zoomsupport.TouchImageView;
-import com.lesliechapman.countedcrossstitch.zoomsupport.ZoomableRelativeLayout;
 
-import android.R.layout;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.GradientDrawable.Orientation;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.view.Window;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnColorPickedListener {
 
 	Bitmap newBitmap;
-	boolean suppressDraw = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		if (!suppressDraw) {
-			drawCanvas();
-		}
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_main);		
+
+		drawCanvas();
+
 	}
 
 	@Override
@@ -72,7 +54,6 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 		startActivity(intent);
 	}
 
-	@SuppressLint("NewApi")
 	private void drawCanvas() {
 
 		BitmapFactory.Options opt = new BitmapFactory.Options();
@@ -85,7 +66,7 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 		int h = bmp.getHeight();
 		int squareSize = 10;
 
-		newBitmap = Bitmap.createBitmap(w * squareSize, h * squareSize,
+		newBitmap = Bitmap.createBitmap((w * squareSize) , (h * squareSize),
 				Bitmap.Config.ARGB_8888);
 
 		for (int x = 0; x < w; x++) {
@@ -93,6 +74,7 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 				int color = bmp.getPixel(x, y);
 				for (int i = 0; i < squareSize; i++) {
 					for (int j = 0; j < squareSize; j++) {
+						
 						newBitmap.setPixel((x * squareSize) + i,
 								(y * squareSize) + j, color);
 					}
@@ -100,25 +82,73 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 			}
 		}
 
-		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);// new
-																				// TouchImageView(this);
+		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);
 		touch.setImageBitmap(newBitmap);
-		touch.setMaxZoom(7f); // change the max level of zoom, default is 3f
+		touch.setMaxZoom(10f); 
 		touch.registerListener(this);
-		// setContentView(touch);
 
 	}
 
 	@Override
 	public void onColorPicked(int x, int y) {
-		suppressDraw = true;
-
-		int color = newBitmap.getPixel(Math.round(x), Math.round(y));
+		Bitmap bm;
+		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);
+		View v1 = touch.getRootView();
+		v1.setDrawingCacheEnabled(true);
+		bm = Bitmap.createBitmap(v1.getDrawingCache());
+		v1.setDrawingCacheEnabled(false);
+		
+		int textHeight = ((TextView)findViewById(R.id.textView1)).getHeight();
+		
+		int color = bm.getPixel(x, y + textHeight);
 
 		System.out.println(ColorUtils.getDMCColor(color));
 
-		// ((TextView)findViewById(R.id.textView1)).setText("Large Text");//ColorUtils.getDMCColor(color));
+		((TextView)findViewById(R.id.textView1)).setText(ColorUtils.getDMCColor(color));
+		
+		outlineColor(color);
 
+	}
+	
+	private void outlineColor(int color){
+		int w = newBitmap.getWidth();
+		int h = newBitmap.getHeight();
+		
+		//newBitmap.
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (newBitmap.getPixel(x, y) == color){
+					if(x== 0 || y==0 || x == w-1 || y == h-1){
+						newBitmap.setPixel(x, y, Color.RED);
+					} else if (newBitmap.getPixel(x+1, y) != color && newBitmap.getPixel(x+1, y) != Color.RED){
+						newBitmap.setPixel(x, y, Color.RED);
+					} else if (newBitmap.getPixel(x-1, y) != color && newBitmap.getPixel(x-1, y) != Color.RED){
+						newBitmap.setPixel(x, y, Color.RED);
+					} else if(newBitmap.getPixel(x, y+1) != color && newBitmap.getPixel(x, y+1) != Color.RED){
+						newBitmap.setPixel(x, y, Color.RED);
+					} else if(newBitmap.getPixel(x, y-1) != color && newBitmap.getPixel(x, y-1) != Color.RED){
+						newBitmap.setPixel(x, y, Color.RED);
+					}		
+					
+					
+					//the following will change the selected color to red
+					/*if (x > 0 && (!(newBitmap.getPixel(x-1, y) == color))){
+						newBitmap.setPixel(x, y, Color.RED);
+					}
+					else if (x < w-1 && (!(newBitmap.getPixel(x+1, y) == color))){
+						newBitmap.setPixel(x, y, Color.RED);
+					}
+					else if (y > 0 && (!(newBitmap.getPixel(x, y-1) == color))){
+						newBitmap.setPixel(x, y, Color.RED);
+					}
+					else if (y < h-1 && (!(newBitmap.getPixel(x, y+1) == color))){
+						newBitmap.setPixel(x, y, Color.RED);
+					}*/
+				}
+			}
+		}
+		
 	}
 
 }
