@@ -3,9 +3,9 @@ package com.lesliechapman.countedcrossstitch;
 import java.util.ArrayList;
 
 import com.lesliechapman.countedcrossstitch.util.ColorUtils;
+import com.lesliechapman.countedcrossstitch.zoomsupport.OnColorPickedListener;
 import com.lesliechapman.countedcrossstitch.zoomsupport.TouchImageView;
 import com.lesliechapman.countedcrossstitch.zoomsupport.ZoomableRelativeLayout;
-
 
 import android.R.layout;
 import android.annotation.SuppressLint;
@@ -34,83 +34,91 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
-	
+public class MainActivity extends Activity implements OnColorPickedListener {
+
 	Bitmap newBitmap;
+	boolean suppressDraw = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		drawCanvas();
+		if (!suppressDraw) {
+			drawCanvas();
+		}
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);		
+		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.show_palette:
-	        	launchPalette();
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.show_palette:
+			launchPalette();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
-	
-	private void launchPalette(){
+
+	private void launchPalette() {
 		Intent intent = new Intent(this, PaletteActivity.class);
 		startActivity(intent);
 	}
 
-	
 	@SuppressLint("NewApi")
-	private void drawCanvas(){
-		
-			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inDither = false;
-			opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bmp = BitmapFactory.decodeResource(this.getResources(), R.drawable.gerritt, opt);	
-			
-			
-			
-	        int w = bmp.getWidth();
-	        int h = bmp.getHeight();
-	        int squareSize = 10;
-	         
-	        newBitmap = Bitmap.createBitmap(w*squareSize, 
-				    h*squareSize, Bitmap.Config.ARGB_8888);
-	        
-	        for (int x = 0; x < w; x++) {
-	        	for (int y = 0; y < h; y++) {
-	        		int color = bmp.getPixel(x, y);	        		
-	        		for (int i = 0; i < squareSize; i++){	        			
-	        			for (int j = 0; j <squareSize; j++){	        		
-	        				newBitmap.setPixel((x * squareSize)+i, (y * squareSize)+j, color);
-	        			}
-	        		}					
-				}				
-			}              
-            
-            TouchImageView touch = (TouchImageView)findViewById(R.id.imageView1);//new TouchImageView(this);
-            touch.setImageBitmap(newBitmap);
-            touch.setMaxZoom(5f); //change the max level of zoom, default is 3f
-            //setContentView(touch);
-	        
+	private void drawCanvas() {
+
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		opt.inDither = false;
+		opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bmp = BitmapFactory.decodeResource(this.getResources(),
+				R.drawable.gerritt, opt);
+
+		int w = bmp.getWidth();
+		int h = bmp.getHeight();
+		int squareSize = 10;
+
+		newBitmap = Bitmap.createBitmap(w * squareSize, h * squareSize,
+				Bitmap.Config.ARGB_8888);
+
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int color = bmp.getPixel(x, y);
+				for (int i = 0; i < squareSize; i++) {
+					for (int j = 0; j < squareSize; j++) {
+						newBitmap.setPixel((x * squareSize) + i,
+								(y * squareSize) + j, color);
+					}
+				}
+			}
+		}
+
+		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);// new
+																				// TouchImageView(this);
+		touch.setImageBitmap(newBitmap);
+		touch.setMaxZoom(7f); // change the max level of zoom, default is 3f
+		touch.registerListener(this);
+		// setContentView(touch);
+
 	}
-	
-	public void setCurrentColor(float x, float y){
-		
+
+	@Override
+	public void onColorPicked(int x, int y) {
+		suppressDraw = true;
+
 		int color = newBitmap.getPixel(Math.round(x), Math.round(y));
-		
-		//((TextView)findViewById(R.id.textView1)).setText(ColorUtils.getDMCColor(color));
+
+		System.out.println(ColorUtils.getDMCColor(color));
+
+		// ((TextView)findViewById(R.id.textView1)).setText("Large Text");//ColorUtils.getDMCColor(color));
+
 	}
-    
+
 }
