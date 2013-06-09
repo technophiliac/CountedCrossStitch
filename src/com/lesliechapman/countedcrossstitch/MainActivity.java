@@ -17,8 +17,11 @@ import android.view.Window;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnColorPickedListener {
+	
+	private final static int COLOR_OUTLINE_REQUEST = 1;
 
 	Bitmap newBitmap;
+	int previousColor = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +54,7 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 
 	private void launchPalette() {
 		Intent intent = new Intent(this, PaletteActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, COLOR_OUTLINE_REQUEST);
 	}
 
 	private void drawCanvas() {
@@ -68,15 +71,23 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 
 		newBitmap = Bitmap.createBitmap((w * squareSize) , (h * squareSize),
 				Bitmap.Config.ARGB_8888);
+		
+		Bitmap grid = Bitmap.createBitmap((w * squareSize) , (h * squareSize),
+				Bitmap.Config.ARGB_8888);
 
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				int color = bmp.getPixel(x, y);
 				for (int i = 0; i < squareSize; i++) {
 					for (int j = 0; j < squareSize; j++) {
-						
-						newBitmap.setPixel((x * squareSize) + i,
-								(y * squareSize) + j, color);
+						if(i == 0 || j == 0){
+							grid.setPixel((x * squareSize) + i,
+										(y * squareSize) + j, Color.YELLOW);
+							
+						} else {
+							newBitmap.setPixel((x * squareSize) + i,
+									(y * squareSize) + j, color);
+						}
 					}
 				}
 			}
@@ -85,7 +96,7 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);
 		touch.setImageBitmap(newBitmap);
 		touch.setMaxZoom(10f); 
-		touch.registerListener(this);
+		//touch.registerListener(this);
 
 	}
 
@@ -114,7 +125,20 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 		int w = newBitmap.getWidth();
 		int h = newBitmap.getHeight();
 		
-		//newBitmap.
+		if (previousColor != -1){
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					if (newBitmap.getPixel(x, y) == Color.RED){
+						newBitmap.setPixel(x, y, previousColor);
+					}
+				}
+			}
+			previousColor = -1;
+		}
+		
+		if (color == -1){
+			return;
+		}
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -129,7 +153,9 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 						newBitmap.setPixel(x, y, Color.RED);
 					} else if(newBitmap.getPixel(x, y-1) != color && newBitmap.getPixel(x, y-1) != Color.RED){
 						newBitmap.setPixel(x, y, Color.RED);
-					}		
+					}
+					
+					previousColor = color;
 					
 					
 					//the following will change the selected color to red
@@ -149,6 +175,24 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 			}
 		}
 		
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch (requestCode) {
+		case COLOR_OUTLINE_REQUEST:
+			if (resultCode == Activity.RESULT_OK){
+				int color = data.getIntExtra(PaletteActivity.COLOR_REQUEST, -1);
+				outlineColor(color);
+			}
+			
+			break;
+
+		default:
+			break;
+		}
 	}
 
 }

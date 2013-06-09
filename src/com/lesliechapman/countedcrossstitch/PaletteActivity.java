@@ -7,6 +7,7 @@ import com.lesliechapman.countedcrossstitch.util.ColorUtils;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
@@ -18,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PaletteActivity extends Activity {
+	
+	public static final String COLOR_REQUEST = "COLOR_REQUEST";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +62,11 @@ public class PaletteActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					System.out.println("YOU CLICKED: " + v.getId());
-					((ShapeDrawable)v.getBackground()).getPaint().getColor();
-					
+					int color = ((ShapeDrawable)v.getBackground()).getPaint().getColor();
+					Intent resultIntent = new Intent();
+					resultIntent.putExtra(COLOR_REQUEST, color);
+					setResult(Activity.RESULT_OK, resultIntent);
+					finish();
 				}
 			});
 	        
@@ -84,6 +90,11 @@ public class PaletteActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				System.out.println("YOU CLICKED NONE");
+				int color = -1;
+				Intent resultIntent = new Intent();
+				resultIntent.putExtra(COLOR_REQUEST, color);
+				setResult(Activity.RESULT_OK, resultIntent);
+				finish();
 				
 			}
 		});
