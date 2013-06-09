@@ -14,9 +14,6 @@ public class TouchImageView extends ImageView {
 
 	Matrix matrix = new Matrix();
 
-	// this is so that we can communicate back to the activity
-	private OnColorPickedListener listener;
-
 	// We can be in one of these 3 states
 	static final int NONE = 0;
 	static final int DRAG = 1;
@@ -116,13 +113,6 @@ public class TouchImageView extends ImageView {
 					int xDiff = (int) Math.abs(curr.x - start.x);
 					int yDiff = (int) Math.abs(curr.y - start.y);
 					if (xDiff < CLICK && yDiff < CLICK) {
-						if (listener != null) {
-							System.out.println("saveScale = " + saveScale);
-							System.out.println("right = " + right);
-							System.out.println("bottom = " + bottom);
-							listener.onColorPicked(Math.round(curr.x),
-									Math.round(curr.y));
-						}
 						performClick();
 					}
 					break;
@@ -247,10 +237,6 @@ public class TouchImageView extends ImageView {
 		bottom = height * saveScale - height
 				- (2 * redundantYSpace * saveScale);
 		setImageMatrix(matrix);
-	}
-
-	public void registerListener(OnColorPickedListener l) {
-		listener = l;
 	}
 
 }

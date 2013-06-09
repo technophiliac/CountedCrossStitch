@@ -1,7 +1,6 @@
 package com.lesliechapman.countedcrossstitch;
 
 import com.lesliechapman.countedcrossstitch.util.ColorUtils;
-import com.lesliechapman.countedcrossstitch.zoomsupport.OnColorPickedListener;
 import com.lesliechapman.countedcrossstitch.zoomsupport.TouchImageView;
 
 import android.app.Activity;
@@ -12,15 +11,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements OnColorPickedListener {
+public class MainActivity extends Activity {
 	
 	private final static int COLOR_OUTLINE_REQUEST = 1;
 
 	Bitmap newBitmap;
+	TextView txtView;
 	int previousColor = -1;
 
 	@Override
@@ -30,6 +29,8 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 		setContentView(R.layout.activity_main);		
 
 		drawCanvas();
+		
+		txtView = ((TextView)findViewById(R.id.textView1));
 
 	}
 
@@ -95,33 +96,13 @@ public class MainActivity extends Activity implements OnColorPickedListener {
 
 		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);
 		touch.setImageBitmap(newBitmap);
-		touch.setMaxZoom(10f); 
-		//touch.registerListener(this);
-
-	}
-
-	@Override
-	public void onColorPicked(int x, int y) {
-		Bitmap bm;
-		TouchImageView touch = (TouchImageView) findViewById(R.id.imageView1);
-		View v1 = touch.getRootView();
-		v1.setDrawingCacheEnabled(true);
-		bm = Bitmap.createBitmap(v1.getDrawingCache());
-		v1.setDrawingCacheEnabled(false);
-		
-		int textHeight = ((TextView)findViewById(R.id.textView1)).getHeight();
-		
-		int color = bm.getPixel(x, y + textHeight);
-
-		System.out.println(ColorUtils.getDMCColor(color));
-
-		((TextView)findViewById(R.id.textView1)).setText(ColorUtils.getDMCColor(color));
-		
-		outlineColor(color);
+		touch.setMaxZoom(10f);
 
 	}
 	
 	private void outlineColor(int color){
+		txtView.setText(ColorUtils.getDMCColor(color));
+		
 		int w = newBitmap.getWidth();
 		int h = newBitmap.getHeight();
 		
