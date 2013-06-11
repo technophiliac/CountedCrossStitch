@@ -121,11 +121,31 @@ public class MainActivity extends Activity {
 		int startX = Integer.parseInt(sx + "1");
 		int startY = Integer.parseInt(sy + "1");
 		
-		for(int x = startX; x<startX+SQUARE_SIZE-1; x++ ){
+		for(int i=0; i<SQUARE_SIZE-1; i++){
+			int x = startX + i;
+			int y = startY + i;
+			colorPixel(x, y);
+		}
+		
+		for(int i=0; i<SQUARE_SIZE-1; i++){
+			int x = startX + i;
+			int y = startY + SQUARE_SIZE - i - 2;
+			colorPixel(x, y);
+		}
+		
+		
+		//This will fill in an entire square with a solid color
+		/*for(int x = startX; x<startX+SQUARE_SIZE-1; x++ ){
 			for(int y = startY; y<startY+SQUARE_SIZE-1; y++ ){
 				if(x>=0 && y>=0 && x<pattern.getWidth() && y<pattern.getHeight())
 					pattern.setPixel(x, y, Color.MAGENTA);				
 			}			
+		}*/
+	}
+	
+	private void colorPixel(int x, int y){
+		if(x>=0 && y>=0 && x<pattern.getWidth() && y<pattern.getHeight()){
+			pattern.setPixel(x, y, Color.MAGENTA);
 		}
 	}
 
