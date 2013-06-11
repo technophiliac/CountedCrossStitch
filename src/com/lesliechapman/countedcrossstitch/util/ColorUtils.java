@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.lesliechapman.countedcrossstitch.R;
 
@@ -36,7 +37,11 @@ public class ColorUtils {
         		int B = Color.blue(color);
         		int A = Color.alpha(color);
         		
-				System.out.println("The color at [" + x + "," + y + " is " + ":" + R + ":" + G + ":" + B + "(" + A + ")");
+        		
+        		/*if(getDMCColor(color).equals("blue")){
+        			Log.e("ColorUtils", "The color at [" + x + "," + y + " is " + ":" + getDMCColor(color));
+        		}*/
+        		
 				if (!colors.contains((Integer)color) && A!=0){
 					colors.add((Integer)color);
 				}

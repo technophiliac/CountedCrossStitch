@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 public class TouchImageView extends ImageView {
 
-	Matrix matrix = new Matrix();
+	public static final Matrix matrix = new Matrix();
 
 	// We can be in one of these 3 states
 	static final int NONE = 0;
@@ -21,22 +21,25 @@ public class TouchImageView extends ImageView {
 	int mode = NONE;
 
 	// Remember some things for zooming
-	PointF last = new PointF();
-	PointF start = new PointF();
+	public static PointF last = new PointF();
+	public static PointF start = new PointF();
 	float minScale = 1f;
 	float maxScale = 3f;
 	float[] m;
 
-	float redundantXSpace, redundantYSpace;
+	public static float redundantXSpace, redundantYSpace;
 
-	float width, height;
+	public static float width, height;
 	static final int CLICK = 3;
-	float saveScale = 1f;
-	float right, bottom, origWidth, origHeight, bmWidth, bmHeight;
+	public static float saveScale = 1f;
+	public static float right, bottom, origWidth, origHeight, bmWidth, bmHeight;
 
 	ScaleGestureDetector mScaleDetector;
+	public static float mScaleFactor;
 
 	Context context;
+	
+	public static int currX, currY;
 
 	public TouchImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -114,6 +117,8 @@ public class TouchImageView extends ImageView {
 					int yDiff = (int) Math.abs(curr.y - start.y);
 					if (xDiff < CLICK && yDiff < CLICK) {
 						performClick();
+						currX = Math.round(event.getX());
+						currY = Math.round(event.getY());
 					}
 					break;
 
@@ -150,7 +155,7 @@ public class TouchImageView extends ImageView {
 
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
-			float mScaleFactor = (float) Math.min(
+			mScaleFactor = (float) Math.min(
 					Math.max(.95f, detector.getScaleFactor()), 1.05);
 			float origScale = saveScale;
 			saveScale *= mScaleFactor;
