@@ -109,7 +109,7 @@ public class MainActivity extends Activity {
 		touch.setImageBitmap(pattern);
 		touch.setMaxZoom(10f);
 
-		touch.setOnClickListener(myhandler1);
+		touch.setOnClickListener(handleSquareClick);
 	}
 
 	private void colorSquareAt(float origX, float origY){
@@ -129,28 +129,16 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	View.OnClickListener myhandler1 = new View.OnClickListener() {
+	View.OnClickListener handleSquareClick = new View.OnClickListener() {
 		@SuppressLint("NewApi")
 		public void onClick(View v) {
 
-			// this is where on the screen I clicked
-			System.out.println("start.x = " + TouchImageView.start.x);
-			System.out.println("start.y = " + TouchImageView.start.y);
-
-			RectF r = new RectF();
-			TouchImageView.matrix.mapRect(r);
-			Log.e("MainActivity", "Rect " + r.left + " " + r.top + " "
-					+ r.right + " " + r.bottom + " " + TouchImageView.saveScale
-					+ " ");
-			
 			float[] values = new float[9];
-			TouchImageView.matrix.getValues(values);
-			float x_coord = ((TouchImageView.start.x - values[2])*TouchImageView.saveScale )/values[0];
-			float y_coord= ((TouchImageView.start.y - values[5])*TouchImageView.saveScale )/ values[4];
-			
-			System.out.println("coords: " + x_coord + ", " + y_coord);
+			touch.getMatrix().getValues(values);
+			float x_coord = ((TouchImageView.start.x - values[2])*touch.getScale() )/values[0];
+			float y_coord= ((TouchImageView.start.y - values[5])*touch.getScale() )/ values[4];
 
-			colorSquareAt(x_coord/TouchImageView.saveScale, y_coord/TouchImageView.saveScale);
+			colorSquareAt(x_coord/touch.getScale(), y_coord/touch.getScale());
 
 		}
 	};

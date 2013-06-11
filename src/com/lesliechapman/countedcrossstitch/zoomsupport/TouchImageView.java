@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 public class TouchImageView extends ImageView {
 
-	public static final Matrix matrix = new Matrix();
+	final Matrix matrix = new Matrix();
 
 	// We can be in one of these 3 states
 	static final int NONE = 0;
@@ -27,19 +27,19 @@ public class TouchImageView extends ImageView {
 	float maxScale = 3f;
 	float[] m;
 
-	public static float redundantXSpace, redundantYSpace;
+	float redundantXSpace, redundantYSpace;
 
-	public static float width, height;
+	float width, height;
 	static final int CLICK = 3;
-	public static float saveScale = 1f;
-	public static float right, bottom, origWidth, origHeight, bmWidth, bmHeight;
+	float saveScale = 1f;
+	float right, bottom, origWidth, origHeight, bmWidth, bmHeight;
 
 	ScaleGestureDetector mScaleDetector;
-	public static float mScaleFactor;
+	float mScaleFactor;
 
 	Context context;
 	
-	public static int currX, currY;
+	int currX, currY;
 
 	public TouchImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -242,6 +242,14 @@ public class TouchImageView extends ImageView {
 		bottom = height * saveScale - height
 				- (2 * redundantYSpace * saveScale);
 		setImageMatrix(matrix);
+	}
+	
+	public Matrix getMatrix(){
+		return matrix;
+	}
+	
+	public float getScale(){
+		return saveScale;
 	}
 
 }

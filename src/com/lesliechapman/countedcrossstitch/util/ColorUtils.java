@@ -12,6 +12,8 @@ import com.lesliechapman.countedcrossstitch.R;
 
 public class ColorUtils {
 	
+	private static String TAG = ColorUtils.class.getName();
+	
 	Activity _activity;
 	
 	public ColorUtils(Activity a){
@@ -32,16 +34,8 @@ public class ColorUtils {
         	for (int y = 0; y < h; y++) {
         		int color = bmp.getPixel(x, y);
         		
-        		int R = Color.red(color);
-        		int G = Color.green(color);
-        		int B = Color.blue(color);
         		int A = Color.alpha(color);
-        		
-        		
-        		/*if(getDMCColor(color).equals("blue")){
-        			Log.e("ColorUtils", "The color at [" + x + "," + y + " is " + ":" + getDMCColor(color));
-        		}*/
-        		
+        		        		
 				if (!colors.contains((Integer)color) && A!=0){
 					colors.add((Integer)color);
 				}
@@ -49,7 +43,8 @@ public class ColorUtils {
 			}
 			
 		}
-        System.out.println("Total number of colors in the image = " + colors.size());
+        
+        Log.i(TAG, "Total number of colors in the image = " + colors.size());
         return colors;
 	}
 	

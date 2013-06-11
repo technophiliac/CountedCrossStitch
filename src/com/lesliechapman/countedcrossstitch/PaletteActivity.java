@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 public class PaletteActivity extends Activity {
 	
 	public static final String COLOR_REQUEST = "COLOR_REQUEST";
+	public static final String TAG = PaletteActivity.class.getName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +63,8 @@ public class PaletteActivity extends Activity {
 				
 				@Override
 				public void onClick(View v) {
-					System.out.println("YOU CLICKED: " + v.getId());
 					int color = ((ShapeDrawable)v.getBackground()).getPaint().getColor();
+					Log.i(TAG, "You Selected: " + ColorUtils.getDMCColor(color));
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra(COLOR_REQUEST, color);
 					setResult(Activity.RESULT_OK, resultIntent);
