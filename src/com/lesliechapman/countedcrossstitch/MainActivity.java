@@ -14,13 +14,16 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +36,11 @@ public class MainActivity extends Activity {
 
 	private final static String PROGRESS = "progressMap";
 	private final static int COLOR_OUTLINE_REQUEST = 1;
+	public final static int LOAD_IMAGE_REQUEST = 2;
 	public static int SQUARE_SIZE = 10;
+	public static int MAX_W = 100;
+	public static int MAX_H = 100;
+	public static int MARK_COLOR = Color.MAGENTA;
 
 	Bitmap pattern;
 	Bitmap done;
@@ -67,6 +74,9 @@ public class MainActivity extends Activity {
 		case R.id.show_palette:
 			launchPalette();
 			return true;
+		case R.id.load_image:
+			launchLoadImage();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -76,15 +86,22 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, PaletteActivity.class);
 		startActivityForResult(intent, COLOR_OUTLINE_REQUEST);
 	}
-
-	private void drawCanvas() {
-
+	
+	private void launchLoadImage() {
+		Intent intent = new Intent(this, LoadImageActivity.class);
+		startActivityForResult(intent, LOAD_IMAGE_REQUEST);
+	}
+	
+	private void drawCanvas(){
 		BitmapFactory.Options opt = new BitmapFactory.Options();
 		opt.inDither = false;
 		opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
-		Bitmap bmp = BitmapFactory.decodeResource(this.getResources(),
-				R.drawable.gerritt, opt);
+		drawCanvas(BitmapFactory.decodeResource(this.getResources(),
+				R.drawable.gerritt, opt));
+	}
 
+	private void drawCanvas(Bitmap bmp) {	
+		
 		int w = bmp.getWidth();
 		int h = bmp.getHeight();
 		pattern = Bitmap.createBitmap((w * SQUARE_SIZE), (h * SQUARE_SIZE),
@@ -125,16 +142,18 @@ public class MainActivity extends Activity {
 		
 		Map<String, Boolean> map = (Map<String, Boolean>) settings.getAll();
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 		    String str = entry.getKey();
 			StringTokenizer st2 = new StringTokenizer(str, "-");
+			if(st2.hasMoreElements()){
+				int x = Integer.parseInt(st2.nextElement().toString());
+				if(st2.hasMoreElements()){
+					int y = Integer.parseInt(st2.nextElement().toString());
+					if(entry.getValue()){
+						colorSquareAt(x, y, false);
+					}
+				}
+			}			 
 			
-			int x = Integer.parseInt(st2.nextElement().toString());
-			int y = Integer.parseInt(st2.nextElement().toString());
-	 
-			if(entry.getValue()){
-				colorSquareAt(x, y, false);
-			}
 		}
 
 		touch.setImageBitmap(pattern);
@@ -148,7 +167,7 @@ public class MainActivity extends Activity {
 		String sy = Integer.toString(Math.round(origY));
 		SharedPreferences settings = getSharedPreferences(PROGRESS, 0);
 		boolean isAlreadySelected = false;
-		int color = Color.MAGENTA;
+		int color = MARK_COLOR;
 		
 		if(saveProgress){
 			sx = sx.substring(0, sx.length()-1);
@@ -178,7 +197,6 @@ public class MainActivity extends Activity {
 		if(saveProgress){			
 		    SharedPreferences.Editor editor = settings.edit();
 		    editor.putBoolean(sx + "-" + sy, !isAlreadySelected);
-		    System.out.println("saving " + sx + ", " + sy);
 		    editor.commit();
 		}
 		
@@ -207,7 +225,7 @@ public class MainActivity extends Activity {
 		/*for(int x = startX; x<startX+SQUARE_SIZE-1; x++ ){
 			for(int y = startY; y<startY+SQUARE_SIZE-1; y++ ){
 				if(x>=0 && y>=0 && x<pattern.getWidth() && y<pattern.getHeight())
-					pattern.setPixel(x, y, Color.MAGENTA);				
+					pattern.setPixel(x, y, MARK_COLOR);				
 			}			
 		}*/
 	}
@@ -298,12 +316,19 @@ public class MainActivity extends Activity {
 		switch (requestCode) {
 		case COLOR_OUTLINE_REQUEST:
 			if (resultCode == Activity.RESULT_OK) {
-				int color = data.getIntExtra(PaletteActivity.COLOR_REQUEST, -1);
+				int color = data.getIntExtra(PaletteActivity.COLOR_RESULT, -1);
 				outlineColor(color);
 			}
+			break;
+		case LOAD_IMAGE_REQUEST:
+			if (resultCode == RESULT_OK && null != data) {
+				//Bitmap bitmap = (Bitmap) data.getParcelableExtra(LoadImageActivity.LOAD_IMAGE_RESULT);
+				Bitmap bmp = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()
+                        + File.separator + data.getStringExtra(LoadImageActivity.LOAD_IMAGE_RESULT));
+				drawCanvas(bmp);
+		     }
 
 			break;
-
 		default:
 			break;
 		}

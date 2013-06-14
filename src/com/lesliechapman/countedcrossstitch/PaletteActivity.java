@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 public class PaletteActivity extends Activity {
 	
-	public static final String COLOR_REQUEST = "COLOR_REQUEST";
+	public static final String COLOR_RESULT = "COLOR_RESULT";
 	public static final String TAG = PaletteActivity.class.getName();
 
 	@Override
@@ -66,7 +66,7 @@ public class PaletteActivity extends Activity {
 					int color = ((ShapeDrawable)v.getBackground()).getPaint().getColor();
 					Log.i(TAG, "You Selected: " + ColorUtils.getDMCColor(color));
 					Intent resultIntent = new Intent();
-					resultIntent.putExtra(COLOR_REQUEST, color);
+					resultIntent.putExtra(COLOR_RESULT, color);
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
 				}
@@ -91,10 +91,9 @@ public class PaletteActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				System.out.println("YOU CLICKED NONE");
 				int color = -1;
 				Intent resultIntent = new Intent();
-				resultIntent.putExtra(COLOR_REQUEST, color);
+				resultIntent.putExtra(COLOR_RESULT, color);
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 				

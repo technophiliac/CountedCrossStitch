@@ -5,5 +5,10 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/show_palette"/>
+    <item
+        android:id="@+id/load_image"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/load_image"/>
 
 </menu>
