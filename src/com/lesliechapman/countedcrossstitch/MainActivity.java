@@ -145,32 +145,39 @@ public class MainActivity extends Activity {
 	private void colorSquareAt(float origX, float origY, boolean saveProgress)
 	{
 		String sx = Integer.toString(Math.round(origX));
-		String sy = Integer.toString(Math.round(origY));		
+		String sy = Integer.toString(Math.round(origY));
+		SharedPreferences settings = getSharedPreferences(PROGRESS, 0);
+		boolean isAlreadySelected = false;
+		int color = Color.MAGENTA;
 		
 		if(saveProgress){
 			sx = sx.substring(0, sx.length()-1);
-			sy = sy.substring(0, sy.length()-1);			
+			sy = sy.substring(0, sy.length()-1);
+			isAlreadySelected = settings.getBoolean(sx + "-" + sy, false);
 		}
 		
 		int startX = Integer.parseInt(sx + "1");
 		int startY = Integer.parseInt(sy + "1");
 		
+		if(isAlreadySelected){
+			color = pattern.getPixel(startX + 2, startY);
+		}
+		
 		for(int i=0; i<SQUARE_SIZE-1; i++){
 			int x = startX + i;
 			int y = startY + i;
-			colorPixel(x, y);
+			colorPixel(x, y, color);
 		}
 		
 		for(int i=0; i<SQUARE_SIZE-1; i++){
 			int x = startX + i;
 			int y = startY + SQUARE_SIZE - i - 2;
-			colorPixel(x, y);
+			colorPixel(x, y, color);
 		}
 		
-		if(saveProgress){
-			SharedPreferences settings = getSharedPreferences(PROGRESS, 0);
+		if(saveProgress){			
 		    SharedPreferences.Editor editor = settings.edit();
-		    editor.putBoolean(sx + "-" + sy, true);
+		    editor.putBoolean(sx + "-" + sy, !isAlreadySelected);
 		    System.out.println("saving " + sx + ", " + sy);
 		    editor.commit();
 		}
@@ -205,9 +212,9 @@ public class MainActivity extends Activity {
 		}*/
 	}
 	
-	private void colorPixel(int x, int y){
+	private void colorPixel(int x, int y, int c){
 		if(x>=0 && y>=0 && x<pattern.getWidth() && y<pattern.getHeight()){
-			pattern.setPixel(x, y, Color.MAGENTA);
+			pattern.setPixel(x, y, c);
 		}
 	}
 
