@@ -1,9 +1,6 @@
 package com.lesliechapman.countedcrossstitch;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -14,20 +11,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -125,12 +115,6 @@ public class MainActivity extends Activity {
 						} else {
 							pattern.setPixel((x * SQUARE_SIZE) + i,
 									(y * SQUARE_SIZE) + j, color);
-							if (x == 59 && y == 57) {
-								Log.e("MainActivity",
-										ColorUtils.getDMCColor(color));
-								Log.e("MainActivity", ((x * SQUARE_SIZE) + i)
-										+ ", Y:" + ((y * SQUARE_SIZE) + i));
-							}
 						}
 					}
 				}
@@ -198,28 +182,7 @@ public class MainActivity extends Activity {
 		    SharedPreferences.Editor editor = settings.edit();
 		    editor.putBoolean(sx + "-" + sy, !isAlreadySelected);
 		    editor.commit();
-		}
-		
-		
-
-		//This will store the .bmp to storage
-		/* ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		   pattern.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-		   File f = new File(Environment.getExternalStorageDirectory()
-		                        + File.separator + "test1.jpg");
-		try {
-			f.createNewFile();
-			//write the bytes in file
-			FileOutputStream fo = new FileOutputStream(f);
-			fo.write(bytes.toByteArray());
-
-			// remember close de FileOutput
-			fo.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
+		}		
 		
 		//This will fill in an entire square with a solid color
 		/*for(int x = startX; x<startX+SQUARE_SIZE-1; x++ ){
