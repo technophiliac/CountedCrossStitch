@@ -1,17 +1,26 @@
 package com.lesliechapman.countedcrossstitch;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import com.lesliechapman.countedcrossstitch.util.ColorUtils;
 import com.lesliechapman.countedcrossstitch.zoomsupport.TouchImageView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,10 +31,12 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
+	private final static String PROGRESS = "progressMap";
 	private final static int COLOR_OUTLINE_REQUEST = 1;
 	public static int SQUARE_SIZE = 10;
 
 	Bitmap pattern;
+	Bitmap done;
 	TextView txtView;
 	TouchImageView touch;
 	int previousColor = -1;
@@ -37,7 +48,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		txtView = ((TextView) findViewById(R.id.textView1));
-		touch = (TouchImageView) findViewById(R.id.imageView1);
+		touch = (TouchImageView) findViewById(R.id.imageView1);		
 
 		drawCanvas();
 	}
@@ -78,6 +89,9 @@ public class MainActivity extends Activity {
 		int h = bmp.getHeight();
 		pattern = Bitmap.createBitmap((w * SQUARE_SIZE), (h * SQUARE_SIZE),
 				Bitmap.Config.ARGB_8888);
+		
+		done = Bitmap.createBitmap((w * SQUARE_SIZE), (h * SQUARE_SIZE),
+				Bitmap.Config.ARGB_8888);
 
 		Bitmap grid = Bitmap.createBitmap((w * SQUARE_SIZE), (h * SQUARE_SIZE),
 				Bitmap.Config.ARGB_8888);
@@ -105,18 +119,38 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
+		
+		// Restore progress
+		SharedPreferences settings = getSharedPreferences(PROGRESS, 0);
+		
+		Map<String, Boolean> map = (Map<String, Boolean>) settings.getAll();
+		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+		    String str = entry.getKey();
+			StringTokenizer st2 = new StringTokenizer(str, "-");
+			
+			int x = Integer.parseInt(st2.nextElement().toString());
+			int y = Integer.parseInt(st2.nextElement().toString());
+	 
+			if(entry.getValue()){
+				colorSquareAt(x, y, false);
+			}
+		}
 
 		touch.setImageBitmap(pattern);
 		touch.setMaxZoom(10f);
-
 		touch.setOnClickListener(handleSquareClick);
 	}
 
-	private void colorSquareAt(float origX, float origY){
+	private void colorSquareAt(float origX, float origY, boolean saveProgress)
+	{
 		String sx = Integer.toString(Math.round(origX));
-		sx = sx.substring(0, sx.length()-1);
-		String sy = Integer.toString(Math.round(origY));
-		sy = sy.substring(0, sy.length()-1);
+		String sy = Integer.toString(Math.round(origY));		
+		
+		if(saveProgress){
+			sx = sx.substring(0, sx.length()-1);
+			sy = sy.substring(0, sy.length()-1);			
+		}
 		
 		int startX = Integer.parseInt(sx + "1");
 		int startY = Integer.parseInt(sy + "1");
@@ -132,6 +166,34 @@ public class MainActivity extends Activity {
 			int y = startY + SQUARE_SIZE - i - 2;
 			colorPixel(x, y);
 		}
+		
+		if(saveProgress){
+			SharedPreferences settings = getSharedPreferences(PROGRESS, 0);
+		    SharedPreferences.Editor editor = settings.edit();
+		    editor.putBoolean(sx + "-" + sy, true);
+		    System.out.println("saving " + sx + ", " + sy);
+		    editor.commit();
+		}
+		
+		
+
+		//This will store the .bmp to storage
+		/* ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		   pattern.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+		   File f = new File(Environment.getExternalStorageDirectory()
+		                        + File.separator + "test1.jpg");
+		try {
+			f.createNewFile();
+			//write the bytes in file
+			FileOutputStream fo = new FileOutputStream(f);
+			fo.write(bytes.toByteArray());
+
+			// remember close de FileOutput
+			fo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		
 		
 		//This will fill in an entire square with a solid color
@@ -158,7 +220,7 @@ public class MainActivity extends Activity {
 			float x_coord = ((TouchImageView.start.x - values[2])*touch.getScale() )/values[0];
 			float y_coord= ((TouchImageView.start.y - values[5])*touch.getScale() )/ values[4];
 
-			colorSquareAt(x_coord/touch.getScale(), y_coord/touch.getScale());
+			colorSquareAt(x_coord/touch.getScale(), y_coord/touch.getScale(), true);
 
 		}
 	};
